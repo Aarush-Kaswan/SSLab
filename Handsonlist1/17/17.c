@@ -7,7 +7,10 @@
 int main(void) {
 	struct flock fl;
 	int fd = open("train", O_RDWR);
-	char num[100];
+	if (fd == -1) {
+		printf("Error");
+		return 0;
+	}
 	struct train {
 		int train_no;
 		int ticket_no;

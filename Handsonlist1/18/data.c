@@ -8,8 +8,8 @@ int main(void) {
 		int roll_no;
 	} a;
 
-	for(int i = 110; i < 113; i++) {
-		a.name = "Name";
+	for(int i = 1; i <= 3; i++) {
+		a.name = "A";
 		a.roll_no = i;
 		write(fd, &a, sizeof(a));
 	}

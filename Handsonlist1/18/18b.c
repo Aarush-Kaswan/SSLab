@@ -10,11 +10,13 @@ int main(void) {
 	struct flock fl;
 	
 	int fd = open("18Record", O_RDONLY);
-
+	if (fd == -1) {
+		printf("Error\n");
+		return 0;
+	}
 	printf("Enter record number to read ");
 	int num;
        	scanf("%d", &num);
-	fflush(stdin);	
 	fl.l_type = F_RDLCK;
 	fl.l_whence = SEEK_SET;
 	fl.l_start = (num-1)*sizeof(a);

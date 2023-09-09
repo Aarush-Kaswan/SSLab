@@ -17,6 +17,7 @@ int main(void) {
 	fl.l_type = F_UNLCK;
 	printf("Press any key to unlock file\n");
 	getchar();
+	fcntl(fd, F_SETLK, &fl);
 	
 	return 0;
 }

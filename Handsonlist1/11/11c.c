@@ -7,6 +7,5 @@ int main() {
 
 	write(fd, "Gaddari ",8 );
 	write(duplicateFD, "karbe!!\n", 8);
-	getchar();
 	return 0;
 }

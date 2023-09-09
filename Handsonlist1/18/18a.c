@@ -10,11 +10,13 @@ int main(void) {
 	struct flock fl;
 	
 	int fd = open("18Record", O_RDWR);
-
+	if (fd == -1) {
+		printf("Error\n");
+		return 0;
+	}
 	printf("Enter record to modify ");
 	int num;
        	scanf("%d", &num);
-	//fflush(stdin);	
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
 	fl.l_start = (num-1)*sizeof(a);
@@ -29,9 +31,7 @@ int main(void) {
 	lseek(fd, (num-1)*sizeof(a), SEEK_CUR);
 	read(fd, &a, sizeof(a));
 	printf("Current roll number = %d\n", a.roll_no);
-	lseek(fd, -sizeof(a), SEEK_CUR);
-	write(fd, &a, sizeof(a));
-	
+//	write(fd, &a, sizeof(a));
 	fl.l_type = F_UNLCK;
 	printf("Press any key to unlock\n");
 	getchar();

@@ -7,6 +7,5 @@ int main() {
 
 	write(fd, "Jaldi waha ",11 );
 	write(duplicateFD, "se hato!!", 9);
-	getchar();
 	return 0;
 }
