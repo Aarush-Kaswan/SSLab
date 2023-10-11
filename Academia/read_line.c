@@ -1,7 +1,4 @@
-#ifndef READ_LINE_H
-#define READ_LINE_H
-//#include <stdio.h>
-//#include <sys/types.h>
+#include "read_line.h"
 
 ssize_t read_line(int fd, void *buffer, size_t n)
 {
@@ -28,7 +25,8 @@ ssize_t read_line(int fd, void *buffer, size_t n)
             else /* Some bytes read; add '\0' */
                 break;
         } else { /* 'numRead' must be 1 if we get here */
-            if (totRead < n - 1) { /* Discard > (n - 1) bytes */
+            if (totRead < n - 1)
+            { /* Discard > (n - 1) bytes */
                 totRead++;
                 *buf++ = ch;
             }
@@ -39,5 +37,3 @@ ssize_t read_line(int fd, void *buffer, size_t n)
     *buf = '\0';
     return totRead;
 }
-
-#endif

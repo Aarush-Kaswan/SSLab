@@ -1,8 +1,11 @@
-#include<unistd.h>
-#include<stdio.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
+#ifndef SERVER_H
+#define SERVER_H
 
+#include "headers.h"
 #include "config.h"
-#include "read_line.h"
+#include "student.h"
+#include "faculty.h"
+#include "course.h"
+#include "login.h"
+
+#endif

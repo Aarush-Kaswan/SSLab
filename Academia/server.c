@@ -9,40 +9,156 @@ Date: 10th Oct, 2023.
 
 #include "server.h"
 
-void login(int client_socket, char *user_name, char *password) {
+int login(int client_socket, int type) {
     char *str;
-    int n;
-    char recv_buff[20];
+    int n, status;
+    char recv_buff[20], login_id[50], password[50];
     str = "Enter user-name: ";
-    send(client_socket, str, strlen(str), 0);
+    write(client_socket, str, strlen(str));
 
     n = read_line(client_socket, recv_buff, sizeof(recv_buff));
-    write(STDOUT_FILENO, recv_buff, n);
+    my_strcpy(login_id, recv_buff);
 
     str = "Enter password: ";
-    send(client_socket, str, strlen(str), 0);
+    write(client_socket, str, strlen(str));
     memset(recv_buff, 0, sizeof(recv_buff));
 
     n = read_line(client_socket, recv_buff, sizeof(recv_buff));
-    write(STDOUT_FILENO, recv_buff, n);
+    my_strcpy(password, recv_buff);
 
-    if(strncmp(password, recv_buff, n-1) == 0)
-        str = "login successful";
-    else 
-        str = "login not successful";
-    send(client_socket, str, strlen(str), 0);
+    int fd;
+    struct login st;
+    switch(type) {
+        case ADMIN:
+            if((strcmp(login_id, "admin") == 0) && (strcmp(password, "pass") == 0))
+                status = 1;
+            break;
+        case FACULTY:
+        case STUDENT:
+            openLoginFile(&fd, O_RDONLY);
+            while(1) {
+                n = read(fd, &st, sizeof(struct login));
+                if(n < 0) {
+                    perror("read");
+                    break;
+                }
+                if(n == 0) break;
+                if(checkLoginDetails(login_id, password)) {
+                    status = 1;
+                    break;
+                }
+            }
+    }
+
+    if(status)
+        str = "login successful\n";
+    else
+        str = "login not successful\n";
+    write(client_socket, str, strlen(str));
+    return status;
+}
+
+void adminMenu(int client_socket) {
+    char recv_buff[20];
+    int n, status = 0;
+    char *str;
+    char welcome_msg[250] = "...Welcome to Admin Menu...\n";
+    char *menu = "1. Add Student\n2. View Student Details\n3. Add Faculty\n4. View Faculty Details\n5. Activate Student\n\
+6. Block Student\n7. Update Student Details\n8. Update Faculty Details\n9. Logout\nEnter your choice: ";
+    strcat(welcome_msg, menu);
+    // n = read_line(client_socket, recv_buff, sizeof(recv_buff));
+    while(!status) {
+        send(client_socket, welcome_msg, strlen(welcome_msg), MSG_DONTWAIT);
+        read_line(client_socket, recv_buff, sizeof(recv_buff));
+        switch(atoi(recv_buff)) {
+            case 1:
+                addStudent(client_socket);
+                break;
+            case 2:
+                viewStudent(client_socket);
+                break;
+            case 3:
+                addFaculty(client_socket);
+                break;
+            case 4:
+                viewFaculty(client_socket);
+                break;
+            case 5:
+                modifyStudent(client_socket, 2);
+                break;
+            case 6:
+                modifyStudent(client_socket, 1);
+                break;
+            case 7:
+                modifyStudent(client_socket, 3);
+                break;
+            case 8:
+                modifyFaculty(client_socket);
+                break;
+            case 9:
+                str = "Logged out\nPress Enter to close the connection";
+                write(client_socket, str, strlen(str));
+                status = 1;
+                break;
+            default:
+                str = "Enter correct choice\n";
+                write(client_socket, str, strlen(str));
+        }
+    }
+}
+
+void facultyMenu(int client_socket) {
+    char recv_buff[20];
+    int n, status = 0;
+    char *str;
+    char welcome_msg[250] = "...Welcome to Faculty Menu...\n";
+    char *menu = "1. View Offering Courses\n2. Add new course\n3. Remove course\n4. Update Course\n5. Change password\n\
+6. Logout\nEnter your choice: ";
+    strcat(welcome_msg, menu);
+    // n = read_line(client_socket, recv_buff, sizeof(recv_buff));
+    while(!status) {
+        send(client_socket, welcome_msg, strlen(welcome_msg), MSG_DONTWAIT);
+        read_line(client_socket, recv_buff, sizeof(recv_buff));
+        switch(atoi(recv_buff)) {
+            case 1:
+                viewCourses(client_socket);
+                break;
+            case 2:
+                addCourse(client_socket);
+                break;
+            case 3:
+                removeCourse(client_socket);
+                break;
+            case 4:
+                modifyCourse(client_socket);
+                break;
+            case 5:
+                modifyStudent(client_socket, 2);
+                break;
+            case 6:
+                str = "Logged out\nPress Enter to close the connection";
+                write(client_socket, str, strlen(str));
+                status = 1;
+                break;
+            default:
+                str = "Enter correct choice\n";
+                write(client_socket, str, strlen(str));
+        }
+    }
 }
 
 void handleAdmin(int client_socket) {
-    login(client_socket, "admin", "password");
+    while(!login(client_socket, ADMIN));
+    adminMenu(client_socket);
+}
+
+void handleFaculty(int client_socket) {
+    while(!login(client_socket, FACULTY));
+    facultyMenu(client_socket);
 }
 
 void handleStudent(int client_socket) {
-    login(client_socket, "anurag", "password");
-}
-
-void handleProfessor(int client_socket) {
-    login(client_socket, "abc", "pass");
+    while(!login(client_socket, STUDENT));
 }
 
 int main(int argc, char **argv)
@@ -98,56 +214,39 @@ int main(int argc, char **argv)
             // inet_ntop(AF_INET, &client_address.sin_addr, client_ip, sizeof(client_ip));
             // printf("Client details: Ip Address: %s", client_ip);
             // write(STDOUT_FILENO, client_ip, strlen(client_ip));
-
-            // read(client_socket, buff, sizeof(buff));
-            // printf("Message from client: %s\n", buff);
             char welcome_msg[] = "Welcome to Academia :: Course Registration\nLogin Type\
                 1.Admin\
                 2.Professor\
                 3.Student\nEnter your choice: ";
 
-            char recv_buff[20], send_buff[1024];
-            int n, bytes_to_send;
-            char* move_ptr;
+            char recv_buff[20];
             int status = 0;
             char *str;
 
-            while(1) {
-                while(!status) {
-                    send(client_socket, welcome_msg, strlen(welcome_msg), 0);
-                    memset(recv_buff, 0, sizeof(recv_buff));
-                    n = recv(client_socket, recv_buff, sizeof(recv_buff), 0);
-                    switch (atoi(recv_buff)) {
-                        case 1:
-                            handleAdmin(client_socket);
-                            status = 1;
-                            break;
-                        case 2:
-                            handleProfessor(client_socket);
-                            status = 1;
-                            break;
-                        case 3:
-                            handleStudent(client_socket);
-                            status = 1;
-                            break;
-                        default:
-                            str = "Enter correct choice\n";
-                            send(client_socket, str, strlen(str), 0);
-                    }
+            while(!status) {
+                write(client_socket, welcome_msg, strlen(welcome_msg));
+                memset(recv_buff, 0, sizeof(recv_buff));
+                read_line(client_socket, recv_buff, sizeof(recv_buff));
+                switch (atoi(recv_buff)) {
+                    case 1:
+                        handleAdmin(client_socket);
+                        status = 1;
+                        break;
+                    case 2:
+                        handleFaculty(client_socket);
+                        status = 1;
+                        break;
+                    case 3:
+                        handleStudent(client_socket);
+                        status = 1;
+                        break;
+                    default:
+                        str = "Enter correct choice\n";
+                        write(client_socket, str, strlen(str));
                 }
-                memset(send_buff, 0, sizeof(send_buff));
-                n = read(STDIN_FILENO, send_buff, sizeof(send_buff));
-                send_buff[n] = '\0';
-                // scanf("%s", send_buff);
-                move_ptr = send_buff;
-                bytes_to_send = strlen(send_buff);
-                // while ((n = send(client_socket, move_ptr, bytes_to_send, 0)) > 0) {
-                //     move_ptr = move_ptr + n;
-                //     bytes_to_send = bytes_to_send - n;
-                // }
-                send(client_socket, send_buff, bytes_to_send, 0);
             }
-            exit(0);
+            close(client_socket);
+            exit(EXIT_SUCCESS);
         }
     }
 
