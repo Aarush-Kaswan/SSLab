@@ -12,14 +12,14 @@ Date: 9th Oct, 2023.
 #include<unistd.h>
 
 int main(void) {
-    int buff[80];
-    int fd1 = open("fifo", O_WRONLY);
+    char buff[80];
+    int fd1 = open("../19/fifo", O_WRONLY);
 
     printf("Enter the text: ");
     scanf("%[^\n]", buff);
     write(fd1, buff, sizeof(buff));
 
-    int fd2 = open("fifo2", O_RDONLY);
+    int fd2 = open("../fifo2", O_RDONLY);
     read(fd2, buff, sizeof(buff));
     printf("The text: %s\n", buff);
     

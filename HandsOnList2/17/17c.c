@@ -15,14 +15,14 @@ int main(void) {
     int fd[2];
     pipe(fd);
     if(fork()) {
-        close(STDOUT_FILENO);
+        close(1);
         close(fd[0]);
-        fcntl(fd[1], F_DUPFD, STDOUT_FILENO);
+        fcntl(fd[1], F_DUPFD, 1);
         execl("/bin/ls", "ls", "-l", NULL);
     } else {
-        close(STDIN_FILENO);
+        close(0);
         close(fd[1]);
-        fcntl(fd[0], F_DUPFD, STDIN_FILENO);
+        fcntl(fd[0], F_DUPFD, 0);
         execlp("wc", "wc", NULL);
     }
 

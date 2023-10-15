@@ -2,8 +2,7 @@
 ============================================================================
 Name : 22.c
 Author : Aarush Kaswan
-Description : Write a program to wait for data to be written into FIFO within 10 seconds, use select
-system call with FIFO.
+Description : Write a program to wait for data to be written into FIFO within 10 seconds, use select system call with FIFO.
 Date: 6th Oct, 2023.
 ============================================================================
 */
@@ -14,14 +13,14 @@ Date: 6th Oct, 2023.
 #include<sys/select.h>
 
 int main(void) {
-    int buff[80];
+    char buff[80];
     fd_set readfds;
     struct timeval tv;
-    int fd = open("fifo", O_RDONLY);
+    int fd = open("../fifo", O_RDONLY);
     
     FD_ZERO(&readfds);
     FD_SET(fd, &readfds);
-    tv.tv_sec = 5;
+    tv.tv_sec = 10;
     tv.tv_usec = 0;
 
     int available = select(fd+1, &readfds, NULL, NULL, &tv);

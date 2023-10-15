@@ -12,8 +12,8 @@ Date: 6th Oct, 2023.
 #include<unistd.h>
 
 int main(void) {
-    int buff[80];
-    int fd = open("fifo", O_RDONLY);
+    char buff[80];
+    int fd = open("../19/fifo", O_RDONLY);
     read(fd, buff, sizeof(buff));
     printf("The text: %s\n", buff);
 

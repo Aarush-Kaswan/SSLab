@@ -7,7 +7,7 @@ Date: 10th Oct, 2023
 ============================================================================
 */
 
-#include "client.h"
+#include "headers.h"
 
 int main(int argc, char **argv)
 {
@@ -17,7 +17,6 @@ int main(int argc, char **argv)
     }
     char *ip_address = argv[1];
     int port_number = atoi(argv[2]);
-
     struct sockaddr_in server_address;
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if (sd < 0) {

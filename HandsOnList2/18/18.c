@@ -21,22 +21,22 @@ int main(void)
             close(fd2[0]);
             close(fd2[1]);
             close(fd1[0]);
-            dup2(fd1[1], STDOUT_FILENO);
+            dup2(fd1[1], 1);
             execlp("ls", "ls", "-l", NULL);
         }
         if (!fork()) {
             close(fd1[1]);
-            dup2(fd1[0], STDIN_FILENO);
+            dup2(fd1[0], 0);
             close(fd2[0]);
-            dup2(fd2[1], STDOUT_FILENO);
+            dup2(fd2[1], 1);
             execlp("grep", "grep", "^-", NULL);
         }
-        wait(0);
+        //wait(0);
     } else {
         close(fd1[0]);
         close(fd1[1]);
         close(fd2[1]);
-        dup2(fd2[0], STDIN_FILENO);
+        dup2(fd2[0], 0);
         execlp("wc", "wc", NULL);
     }
     return 0;

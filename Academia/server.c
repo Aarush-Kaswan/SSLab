@@ -6,7 +6,6 @@ Description : Write a program to communicate between two machines using socket.
 Date: 10th Oct, 2023.
 ============================================================================
 */
-
 #include "server.h"
 
 int login(int client_socket, int type) {
