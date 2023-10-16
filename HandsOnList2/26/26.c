@@ -19,10 +19,11 @@ int main(void) {
         char mtext[20];
     } mq;
     key_t key = ftok(".", 2);
-    int msgid = msgget(key, 0);
+    int msgid = msgget(key, IPC_CREAT | 0666);
     printf("Key: 0x%0x, msg-id: %d\n", key, msgid);
     printf("Enter msg type: ");
     scanf("%ld", &mq.mtype);
+    getchar();
     printf("Enter message: ");
     scanf("%[^\n]", mq.mtext);
     int size = strlen(mq.mtext);

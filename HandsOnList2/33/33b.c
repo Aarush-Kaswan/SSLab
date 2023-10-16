@@ -26,7 +26,7 @@ int main(void) {
     connect(sd, (struct sockaddr*) &server, sizeof(server));
     printf("Connected to server\n");
 
-    int buff[80];
+    char buff[80];
     write(sd, "Hello\n", 6);
     read(sd, buff, sizeof(buff));
     printf("Message from Server: %s\n", buff);

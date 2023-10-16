@@ -1,10 +1,10 @@
 /*
 ============================================================================
 Name : 34a.c
-Author : Anurag Babal
+Author : Aarush Kaswan
 Description : Write a program to create a concurrent server.
     a. use fork
-Date: 12th Oct, 2023.
+Date: 15th Oct, 2023.
 ============================================================================
 */
 
@@ -32,7 +32,7 @@ int main(void) {
         } else {
             close(sd);
             printf("Client connected\n");
-            int buff[80];
+            char buff[80];
             read(nsd, buff, sizeof(buff));
             printf("Message from client: %s\n", buff);
             write(nsd, "ACK\n", 4);
