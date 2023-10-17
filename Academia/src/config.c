@@ -1,19 +1,6 @@
-#ifndef CONFIG_H
-#define CONFIG_H
-
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
-#define ADD 2
-#define UPDATE 3
-#define ACTIVE 4
-#define INACTIVE 5
-#define ADMIN 6
-#define FACULTY 7
-#define STUDENT 8
-
-int faculty_id = 0;
-char buff[1024];
-char *default_password = "pass";
+#include "../headers/headers.h"
+#include "../headers/config.h"
+#include "../headers/read_line.h"
 
 void my_strcpy(char *dest, char *src) {
     while (*src != '\n') {
@@ -41,4 +28,9 @@ void my_itoa(int num, char *str, int base) {
     }
 }
 
-#endif
+int getIdFromClient(int client_socket, char *str) {
+    char recv_buff[20];
+    write(client_socket, str, strlen(str));
+    read_line(client_socket, recv_buff, sizeof(recv_buff));
+    return atoi(recv_buff);
+}
